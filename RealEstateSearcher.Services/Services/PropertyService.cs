@@ -77,14 +77,38 @@ namespace RealEstateSearcher.Services.Services
             return result;
         }
 
-        public Task<IEnumerable<Property>> GetPropertiesByBuildingTypeAsync(string buildingType)
+        public async Task<IEnumerable<Property>> GetPropertiesByBuildingTypeAsync(string buildingType)
         {
-            throw new NotImplementedException();
+            var properties = await _context.Properties
+                  .AsNoTracking()
+                 .Include(x => x.BuildingType)
+                 .Include(x=>x.Quarter)
+                 .Where(x => x.BuildingType != null && x.BuildingType.Name == buildingType)
+                 .OrderByDescending(x => x.Price)
+                 .ToListAsync();
+
+            if(!properties.Any())
+            {
+                _logger.LogWarning($"There is no {buildingType} in database");
+            }
+
+            return properties;
         }
 
-        public Task<Property?> GetPropertyByIdAsync(Guid id)
+        public async Task<Property?> GetPropertyByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            var property = await _context.Properties
+                .AsNoTracking()
+                .Include(x=>x.Quarter)
+                .Include(x=>x.BuildingType)
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (property == null)
+            {
+                _logger.LogWarning("Property with ID {PropertyId} not found", id);
+            }
+
+            return property;
         }
 
         public Task<IEnumerable<Property>> GetTop10PropertiesByQuarterAsync(string quarterName)

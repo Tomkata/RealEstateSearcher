@@ -4,10 +4,9 @@ using RealEstateSearcher.Infrastructure.Seeding;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container
+
 builder.Services.AddControllersWithViews();
 
-// Регистриране на DbContext
 builder.Services.AddDbContext<RealEstateDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -46,14 +45,14 @@ static async Task SeedDatabaseAsync(WebApplication app)
 
     try
     {
-        logger.LogInformation("🚀 Starting database initialization...");
+        logger.LogInformation(" Starting database initialization...");
 
         var context = services.GetRequiredService<RealEstateDbContext>();
 
         // Прилагаме миграции
         logger.LogInformation("Applying database migrations...");
         await context.Database.MigrateAsync();
-        logger.LogInformation("✅ Migrations applied successfully");
+        logger.LogInformation(" Migrations applied successfully");
 
         // Seed данните
         logger.LogInformation("Starting data seeding...");
@@ -63,7 +62,7 @@ static async Task SeedDatabaseAsync(WebApplication app)
     }
     catch (Exception ex)
     {
-        logger.LogError(ex, "❌ An error occurred during database initialization");
+        logger.LogError(ex, "An error occurred during database initialization");
         // Не спираме апликацията, само логваме грешката
     }
-} // утре виж какво става и го махни
+} 

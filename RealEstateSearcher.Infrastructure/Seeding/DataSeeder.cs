@@ -4,6 +4,10 @@ using RealEstateSearcher.Core.Models;
 using RealEstateSearcher.Infrastructure;
 using RealEstateSearcher.Infrastructure.Seeding;
 using System.Globalization;
+using System.Text;
+using System.Text.Json;
+using System.Xml;
+using System.Xml.Schema;
 
 public class DatabaseSeeder
 {
@@ -29,81 +33,88 @@ public class DatabaseSeeder
 
         if (!File.Exists(path))
         {
-            _logger.LogError("File not found: {Path}", path);
+            _logger.LogError($"File not found: {path}");
             return;
         }
 
         var json = File.ReadAllText(path);
 
-        var options = new JsonSerializerSettings
+        var options = new JsonSerializerSettings()
         {
             Culture = CultureInfo.InvariantCulture,
-            Formatting = Formatting.Indented,
+            Formatting = Formatting.Indented
         };
 
-        var jsonProperties = JsonConvert.DeserializeObject<List<PropertyDto>>(json, options);
+        var jsonProperties = JsonConvert.DeserializeObject<ICollection<PropertyDto>>(json,options);
 
-        if (jsonProperties == null || !jsonProperties.Any())
+        if (!jsonProperties.Any() || jsonProperties == null)
         {
-            _logger.LogWarning("No data in JSON file.");
+            _logger.LogWarning("No data found in JSON file.");
             return;
         }
 
-        // 1. Добавяме квартали
+        //Quarter Insert
         var uniqueQuarters = jsonProperties
-            .Select(p => p.Quarter)
-            .Where(q => !string.IsNullOrWhiteSpace(q))
+            .Select(x => x.Quarter)
+            .Where(x=>!string.IsNullOrWhiteSpace(x))
             .Distinct()
             .ToList();
 
-        var quarterDict = new Dictionary<string, Quarter>();
+
+        var quarterDic = new Dictionary<string, Quarter>();
+
         foreach (var quarterName in uniqueQuarters)
         {
-            var quarter = new Quarter { Name = quarterName };
-            _context.Quarters.Add(quarter);
-            quarterDict[quarterName] = quarter;
+            var queater = new Quarter() { Name = quarterName };
+
+            _context.Quarters.Add(queater);
+
+            quarterDic[quarterName] = queater;
         }
         _context.SaveChanges();
-        _logger.LogInformation("Added {Count} quarters", quarterDict.Count);
 
-        // 2. Добавяме типове сгради
-        var uniqueBuildingTypes = jsonProperties
-            .Select(p => p.BuildingType)
-            .Where(bt => !string.IsNullOrWhiteSpace(bt))
+        //BuildingType Insert
+
+        var uniqueBuildingType = jsonProperties
+            .Select(x => x.BuildingType)
+            .Where(x => !string.IsNullOrWhiteSpace(x) && x != null)
             .Distinct()
             .ToList();
 
-        var buildingTypeDict = new Dictionary<string, BuildingType>();
-        foreach (var typeName in uniqueBuildingTypes)
+        var buildingTypeDic = new Dictionary<string, BuildingType>();
+
+        foreach (var buildingTypeName in uniqueBuildingType)
         {
-            var buildingType = new BuildingType { Name = typeName };
+            var buildingType = new BuildingType() { Name =  buildingTypeName };
+
             _context.BuildingTypes.Add(buildingType);
-            buildingTypeDict[typeName] = buildingType;
+
+            buildingTypeDic[buildingTypeName] = buildingType;
         }
         _context.SaveChanges();
-        _logger.LogInformation("Added {Count} building types", buildingTypeDict.Count);
 
-        // 3. Добавяме имоти
         var properties = new List<Property>();
+
         foreach (var dto in jsonProperties)
         {
-            if (!quarterDict.ContainsKey(dto.Quarter))
-                continue;
-
-            var property = new Property
+            if (!quarterDic.ContainsKey(dto.Quarter))
             {
-                Title = dto.Title ?? "Без заглавие",
-                Price = dto.Price,
-                Area = dto.Area,
-                Floor = dto.Floor,
-                TotalFloors = dto.TotalFloors,
-                QuarterId = quarterDict[dto.Quarter].Id,
-                BuildingTypeId = !string.IsNullOrWhiteSpace(dto.BuildingType) && buildingTypeDict.ContainsKey(dto.BuildingType)
-                    ? buildingTypeDict[dto.BuildingType].Id
-                    : null
-            };
+                _logger.LogWarning("Quarter not found: {Quarter}", dto.Quarter);
+                continue; 
+            }
 
-            properties.Add(property);
+            properties.Add(new Property
+            {
+                 Title = dto.Title ?? "Без заглавие",
+                 Price = dto.Price,
+                 Area = dto.Area,
+                 Floor = dto.Floor,
+                 QuarterId = quarterDic[dto.Quarter].Id,
+                 BuildingTypeId = !string.IsNullOrWhiteSpace(buildingTypeDic[dto.BuildingType].Name) 
+                 && buildingTypeDic.ContainsKey(dto.BuildingType)  
+                 ? buildingTypeDic[dto.BuildingType].Id
+                 : null
+            });
         }
 
         _context.Properties.AddRange(properties);
@@ -111,5 +122,6 @@ public class DatabaseSeeder
         _logger.LogInformation("Added {Count} properties", properties.Count);
 
         _logger.LogInformation("Seeding completed successfully!");
+
     }
 }
