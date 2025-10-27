@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="RealEstateSearcher.Core/RealEstateSearcher.Core.csproj" Id="42d557df-84bc-4928-ad6f-7716c24aa411" />
+  <Project Path="RealEstateSearcher.Infrastructure/RealEstateSearcher.Infrastructure.csproj" Id="fe82b862-734c-404f-b188-b430a2dc7dcc" />
+  <Project Path="RealEstateSearcher.Services/RealEstateSearcher.Services.csproj" Id="384407d2-3c7c-4f36-bb49-36e84eec7ae8" />
+  <Project Path="RealEstateSearcher/RealEstateSearcher.Web.csproj" />
+</Solution>
