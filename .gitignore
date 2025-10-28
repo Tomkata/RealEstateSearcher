@@ -11,7 +11,7 @@ x86/
 [Oo]bj/
 
 ## User-specific files
-*.suo
+*.suo	
 *.user
 *.userosscache
 *.sln.docstates

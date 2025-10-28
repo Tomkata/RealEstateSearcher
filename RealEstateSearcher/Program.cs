@@ -1,6 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RealEstateSearcher.Infrastructure;
-using RealEstateSearcher.Infrastructure.Seeding;
+using RealEstateSearcher.Infrastructure.Dtos;
+using RealEstateSearcher.Services.Interfaces;
+using RealEstateSearcher.Services.Services;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +13,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<RealEstateDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<IPropertyService, PropertyService>();
 
 var app = builder.Build();
 

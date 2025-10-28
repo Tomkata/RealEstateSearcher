@@ -1,0 +1,116 @@
+﻿@model RealEstateSearcher.Core.Models.Property
+
+@{
+    ViewData["Title"] = "Детайли за имот";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">
+                        <i class="bi bi-house-door"></i> @Model.Title
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h3 class="text-primary">
+                                @Model.Price.ToString("N0") лв
+                            </h3>
+                            <p class="text-muted">
+                                <i class="bi bi-calculator"></i>
+                                @Model.PriceByArea.ToString("N0") лв/m²
+                            </p>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <span class="badge bg-info fs-6">
+                                <i class="bi bi-geo-alt"></i> @Model.Quarter.Name
+                            </span>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <h5><i class="bi bi-rulers"></i> Площ</h5>
+                            <p class="lead">@Model.Area m²</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h5><i class="bi bi-building"></i> Етаж</h5>
+                            <p class="lead">@Model.Floor / @Model.TotalFloors</p>
+                        </div>
+                    </div>
+
+                    @if (Model.BuildingType != null)
+                    {
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <h5><i class="bi bi-house"></i> Тип сграда</h5>
+                                <p class="lead">@Model.BuildingType.Name</p>
+                            </div>
+                        </div>
+                    }
+
+                    <hr />
+
+                    <div class="alert alert-light">
+                        <h5>Информация за квартал: @Model.Quarter.Name</h5>
+                        <p class="mb-0">
+                            <i class="bi bi-info-circle"></i>
+                            Този имот се намира в квартал @Model.Quarter.Name
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="">
+                <div class="card-header">
+                    <h5 class="mb-0">Действия</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a asp-action="Edit" asp-route-id="@Model.Id"
+                           class="btn btn-warning">
+                            <i class="bi bi-pencil"></i> Редактирай
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@Model.Id"
+                           class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Изтрий
+                        </a>
+                        <hr />
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Обратно към списъка
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Бързи изчисления</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Цена за m²</span>
+                            <strong>@Model.PriceByArea.ToString("N0") лв</strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Обща площ</span>
+                            <strong>@Model.Area m²</strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Обща цена</span>
+                            <strong>@Model.Price.ToString("N0") лв</strong>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

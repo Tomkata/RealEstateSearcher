@@ -12,6 +12,7 @@ namespace RealEstateSearcher.Services.Interfaces
         Task<IEnumerable<Property>> SearchByPriceRangeAsync(decimal minPrice, decimal maxPrice);
         Task<IEnumerable<Property>> GetPropertiesByBuildingTypeAsync(string buildingType);
         Task<IEnumerable<QuarterAveragePrice>> GetAveragePricesByQuartersAsync();
+        Task<IEnumerable<Property>> GetPropertiesByQuarterAsync(string quarterName);    
         Task<Property> AddPropertyAsync(
             string title,
             decimal price,

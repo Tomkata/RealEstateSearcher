@@ -2,12 +2,13 @@
 using Newtonsoft.Json;
 using RealEstateSearcher.Core.Models;
 using RealEstateSearcher.Infrastructure;
-using RealEstateSearcher.Infrastructure.Seeding;
+using RealEstateSearcher.Infrastructure.Dtos;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using System.Xml;
 using System.Xml.Schema;
+using Formatting = Newtonsoft.Json.Formatting;
 
 public class DatabaseSeeder
 {
@@ -42,7 +43,7 @@ public class DatabaseSeeder
         var options = new JsonSerializerSettings()
         {
             Culture = CultureInfo.InvariantCulture,
-            Formatting = Formatting.Indented
+            Formatting =  Formatting.Indented
         };
 
         var jsonProperties = JsonConvert.DeserializeObject<ICollection<PropertyDto>>(json,options);

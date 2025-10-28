@@ -20,6 +20,8 @@ namespace RealEstateSearcher.Core.Models
         [StringLength(80,MinimumLength =5)]
         public string Name { get; set; }
 
-        public virtual ICollection<Property> Properties { get; set; } = new HashSet<Property>();    
+        public virtual ICollection<Property> Properties { get; set; } = new HashSet<Property>();
+        
+
     }
 }

@@ -25,8 +25,8 @@ namespace RealEstateSearcher.Web.Controllers
         }
 
         public async Task<IActionResult> Details(Guid id)
-        {
-            var property = _propertyService.GetPropertyByIdAsync(id);
+        {   
+            var property = await _propertyService.GetPropertyByIdAsync(id);       
 
             if (property == null)
             {

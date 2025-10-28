@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace RealEstateSearcher.Services.Dtos
 {
-    internal class QuarterAveragePrice
+    public class QuarterAveragePrice
     {
+        public string Name { get; set; }
+        public decimal AveragePrice { get; set; }
+        public int PropertiesCount { get; set; }
     }
 }
