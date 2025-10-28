@@ -6,4 +6,3 @@ It pulls apartment data from imot.bg and lets you browse and search through them
 1. Project Overview
 
 RealEstateSearcher is designed to give you a scaffold for a real-estate listing/search service. It handles core concerns (data model, services, infrastructure) so you can focus on adding domain features or customizing UI.
-If your end-goal is to launch a full product, you’ll still need to add things like authentication, pagination, production-ready deployment, etc.
