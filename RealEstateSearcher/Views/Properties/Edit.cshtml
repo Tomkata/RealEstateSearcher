@@ -1,1 +1,210 @@
-﻿
+﻿@model RealEstateSearcher.Core.Models.Property
+
+@{
+    ViewData["Title"] = "Редактирай имот";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-warning">
+                    <h2 class="mb-0">
+                        <i class="bi bi-pencil"></i> Редактирай имот
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post">
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                        <div class="mb-3">
+                            <label for="title" class="form-label">
+                                <i class="bi bi-card-text"></i> Заглавие *
+                            </label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="title"
+                                   name="title"
+                                   value="@Model.Title"
+                                   required
+                                   maxlength="200" />
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="price" class="form-label">
+                                    <i class="bi bi-currency-exchange"></i> Цена (лв) *
+                                </label>
+                                <input type="number"
+                                       class="form-control"
+                                       id="price"
+                                       name="price"
+                                       value="@Model.Price"
+                                       step="0.01"
+                                       min="0"
+                                       required />
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="area" class="form-label">
+                                    <i class="bi bi-rulers"></i> Площ (m²) *
+                                </label>
+                                <input type="number"
+                                       class="form-control"
+                                       id="area"
+                                       name="area"
+                                       value="@Model.Area"
+                                       min="1"
+                                       max="10000"
+                                       required />
+                            </div>
+                        </div>
+
+                        <div class="alert alert-light mb-3">
+                            <strong>Текуща цена за m²:</strong>
+                            <span class="text-primary fs-5">
+                                @((Model.Price / Model.Area).ToString("N0")) лв/m²
+                            </span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="floor" class="form-label">
+                                    <i class="bi bi-building"></i> Етаж *
+                                </label>
+                                <input type="number"
+                                       class="form-control"
+                                       id="floor"
+                                       name="floor"
+                                       value="@Model.Floor"
+                                       min="0"
+                                       max="100"
+                                       required />
+                                <div class="form-text">0 за партер</div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="totalFloors" class="form-label">
+                                    <i class="bi bi-building"></i> Общо етажи *
+                                </label>
+                                <input type="number"
+                                       class="form-control"
+                                       id="totalFloors"
+                                       name="totalFloors"
+                                       value="@Model.TotalFloors"
+                                       min="1"
+                                       max="100"
+                                       required />
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="quarterName" class="form-label">
+                                <i class="bi bi-geo-alt"></i> Квартал *
+                            </label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="quarterName"
+                                   name="quarterName"
+                                   value="@Model.Quarter.Name"
+                                   list="quarters"
+                                   required
+                                   maxlength="100" />
+                            <datalist id="quarters">
+                                <option value="Лозенец"></option>
+                                <option value="Център"></option>
+                                <option value="Младост"></option>
+                                <option value="Люлин"></option>
+                                <option value="Драгалевци"></option>
+                                <option value="Витоша"></option>
+                                <option value="Бояна"></option>
+                                <option value="Подуяне"></option>
+                                <option value="Банишора"></option>
+                                <option value="Овча купел"></option>
+                            </datalist>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="buildingTypeName" class="form-label">
+                                <i class="bi bi-house"></i> Тип сграда (незадължително)
+                            </label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="buildingTypeName"
+                                   name="buildingTypeName"
+                                   value="@(Model.BuildingType?.Name ?? "")"
+                                   list="buildingTypes"
+                                   maxlength="50" />
+                            <datalist id="buildingTypes">
+                                <option value="Тухла"></option>
+                                <option value="Панел"></option>
+                                <option value="ЕПК"></option>
+                                <option value="ТЕЦ"></option>
+                                <option value="Нова сграда"></option>
+                            </datalist>
+                        </div>
+
+                        <div class="alert alert-secondary">
+                            <small>
+                                <i class="bi bi-info-circle"></i>
+                                <strong>ID на имота:</strong> <code>@Model.Id</code>
+                            </small>
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Отказ
+                            </a>
+                            <button type="submit" class="btn btn-warning btn-lg">
+                                <i class="bi bi-check-circle"></i> Запази промените
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="alert alert-warning mt-4">
+                <h5><i class="bi bi-exclamation-triangle"></i> Внимание:</h5>
+                <ul class="mb-0">
+                    <li>Промените са необратими след запазване</li>
+                    <li>При промяна на квартал или тип сграда, могат да се създадат нови записи</li>
+                    <li>Цената на m² се изчислява автоматично</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        const priceInput = document.getElementById('price');
+        const areaInput = document.getElementById('area');
+
+        function updatePricePerArea() {
+            const price = parseFloat(priceInput.value);
+            const area = parseFloat(areaInput.value);
+
+            if (price > 0 && area > 0) {
+                const pricePerArea = (price / area).toFixed(0);
+
+                console.log(`Нова цена за m²: ${pricePerArea} лв`);
+
+                const alertDiv = document.querySelector('.alert-light');
+                if (alertDiv) {
+                    alertDiv.innerHTML = `
+                        <strong>Нова цена за m²:</strong>
+                        <span class="text-success fs-5">${parseInt(pricePerArea).toLocaleString('bg-BG')} лв/m²</span>
+                    `;
+                }
+            }
+        }
+
+        priceInput?.addEventListener('input', updatePricePerArea);
+        areaInput?.addEventListener('input', updatePricePerArea);
+    </script>
+}

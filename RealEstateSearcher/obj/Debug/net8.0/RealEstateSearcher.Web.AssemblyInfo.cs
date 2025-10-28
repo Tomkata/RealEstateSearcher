@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("RealEstateSearcher.Web")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f45d0a77d3d440e71413ddcb9845031e12ddaa14")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+78af4487ce581ad9a0cf46d70db6298c3fa4bc39")]
 [assembly: System.Reflection.AssemblyProductAttribute("RealEstateSearcher.Web")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RealEstateSearcher.Web")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
