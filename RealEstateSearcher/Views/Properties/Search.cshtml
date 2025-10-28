@@ -1,0 +1,127 @@
+﻿@{
+    ViewData["Title"] = "Търсене на имоти";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">
+                        <i class="bi bi-search"></i> Търсене на имоти
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Search" method="get">
+                        <div class="row">
+                            <div class="col-12 mb-4">
+                                <h5 class="border-bottom pb-2">
+                                    <i class="bi bi-currency-exchange text-primary"></i> Търсене по цена
+                                </h5>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="minPrice" class="form-label">Минимална цена (лв)</label>
+                                <input type="number" 
+                                       class="form-control" 
+                                       id="minPrice" 
+                                       name="minPrice" 
+                                       placeholder="50000"
+                                       min="0"
+                                       step="1000" />
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="maxPrice" class="form-label">Максимална цена (лв)</label>
+                                <input type="number" 
+                                       class="form-control" 
+                                       id="maxPrice" 
+                                       name="maxPrice" 
+                                       placeholder="300000"
+                                       min="0"
+                                       step="1000" />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12 mb-4">
+                                <h5 class="border-bottom pb-2">
+                                    <i class="bi bi-geo-alt text-primary"></i> Търсене по локация
+                                </h5>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="quarterName" class="form-label">Квартал</label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="quarterName" 
+                                       name="quarterName" 
+                                       placeholder="напр. Лозенец"
+                                       list="quarters" />
+                                <datalist id="quarters">
+                                    <option value="Лозенец"></option>
+                                    <option value="Център" ></option>
+                                    <option value="Младост"></option>
+                                    <option value="Люлин" ></option>
+                                    <option value="Драгалевци" ></option>
+                                    <option value="Витоша" ></option>
+                                    <option value="Бояна" ></option>
+                                    <option value="Подуяне" ></option>  
+                                    <option value="Банишора" ></option>
+                                </datalist>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12 mb-4">
+                                <h5 class="border-bottom pb-2">
+                                    <i class="bi bi-house text-primary"></i> Търсене по тип сграда
+                                </h5>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="buildingType" class="form-label">Тип сграда</label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="buildingType" 
+                                       name="buildingType" 
+                                       placeholder="напр. Тухла, Панел, ЕПК"
+                                       list="buildingTypes" />
+                                <datalist id="buildingTypes">
+                                    <option value="Тухла"></option>
+                                    <option value="Панел"></option>
+                                    <option value="ЕПК"></option>
+                                    <option value="ТЕЦ"></option>
+                                    <option value="Нова сграда"></option>
+                                </datalist>
+                            </div>
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-search"></i> Търси
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> Обратно към всички имоти
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="alert alert-info mt-4">
+                <i class="bi bi-info-circle"></i>
+                <strong>Съвет:</strong> Можете да търсите само по един критерий наведнъж. 
+                Ако въведете повече от един, ще се използва първия зададен.
+            </div>
+        </div>
+    </div>
+</div>

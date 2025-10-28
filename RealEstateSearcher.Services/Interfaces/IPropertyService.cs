@@ -1,15 +1,21 @@
-﻿
-using RealEstateSearcher.Services.Dtos;
+﻿using RealEstateSearcher.Services.Dtos;
 using Property = RealEstateSearcher.Core.Models.Property;
 
 namespace RealEstateSearcher.Services.Interfaces  
 {
     public interface IPropertyService
     {
+        Task<PagedResult<Property>> GetPropertiesPagedAsync(int pageNumber = 1, int pageSize = 12);
+ 
         Task<IEnumerable<Property>> GetAllPropertiesAsync();
         Task<Property?> GetPropertyByIdAsync(Guid id);
         Task<IEnumerable<Property>> GetTop10PropertiesByQuarterAsync(string quarterName);
         Task<IEnumerable<Property>> SearchByPriceRangeAsync(decimal minPrice, decimal maxPrice);
+        Task<PagedResult<Property>> SearchByPriceRangePagedAsync(
+        int minPrice,
+        int maxPrice,
+        int pageNumber,
+        int pageSize);
         Task<IEnumerable<Property>> GetPropertiesByBuildingTypeAsync(string buildingType);
         Task<IEnumerable<QuarterAveragePrice>> GetAveragePricesByQuartersAsync();
         Task<IEnumerable<Property>> GetPropertiesByQuarterAsync(string quarterName);    

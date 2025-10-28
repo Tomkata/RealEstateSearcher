@@ -1,0 +1,192 @@
+﻿@model RealEstateSearcher.Services.Dtos.PagedResult<RealEstateSearcher.Core.Models.Property>
+@{
+    ViewData["Title"] = "Резултати от търсенето";
+    var searchType = ViewBag.SearchType as string;
+}
+
+
+<div class="container mt-4">
+    <!-- Header с информация за търсенето -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>
+                <i class="bi bi-search"></i> Резултати от търсенето
+            </h1>
+
+            @if (searchType == "price")
+            {
+                <p class="lead">
+                    Цена между <strong>@ViewBag.MinPrice лв</strong> и <strong>@ViewBag.MaxPrice лв</strong>
+                </p>
+            }
+            else if (searchType == "quarter")
+            {
+                <p class="lead">
+                    Квартал: <span class="badge bg-info fs-6">@ViewBag.QuarterName</span>
+                </p>
+            }
+            else if (searchType == "buildingType")
+            {
+                <p class="lead">
+                    Тип сграда: <strong>@ViewBag.BuildingType</strong>
+                </p>
+            }
+
+            <p class="text-muted">
+                Намерени имоти: <strong>@Model.TotalCount</strong>
+                @if (Model.TotalCount > 0)
+                {
+                    <span>
+                        (показване на
+                        <strong>@((Model.PageNumber - 1) * Model.PageSize + 1)</strong>
+                        до
+                        <strong>@Math.Min(Model.PageNumber * Model.PageSize, Model.TotalCount)</strong>)
+                    </span>
+                }
+            </p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a asp-action="Search" class="btn btn-primary mb-2">
+                <i class="bi bi-arrow-left"></i> Ново търсене
+            </a>
+            <a asp-action="Index" class="btn btn-secondary mb-2">
+                <i class="bi bi-list"></i> Всички имоти
+            </a>
+        </div>
+    </div>
+
+    @if (!Model.Items.Any())
+    {
+        <div class="alert alert-warning text-center py-5">
+            <i class="bi bi-exclamation-triangle fs-1"></i>
+            <h3 class="mt-3">Няма намерени имоти</h3>
+            <p>Опитайте с различни критерии за търсене.</p>
+            <a asp-action="Search" class="btn btn-primary mt-3">
+                <i class="bi bi-search"></i> Ново търсене
+            </a>
+        </div>
+    }
+    else
+    {
+        <!-- Резултати -->
+        <div class="row">
+            @foreach (var property in Model.Items)
+            {
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="card-title mb-0 text-truncate" title="@property.Title">
+                                @property.Title
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <h3 class="text-success mb-2">
+                                @property.Price.ToString("N0") лв
+                            </h3>
+                            <p class="text-muted small mb-3">
+                                <i class="bi bi-calculator"></i>
+                                @((property.Price / property.Area).ToString("N0")) лв/m²
+                            </p>
+
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="bi bi-geo-alt-fill text-success"></i>
+                                    <strong>Квартал:</strong>
+                                    <span class="badge bg-info">@property.Quarter.Name</span>
+                                </li>
+                                <li class="mb-2">
+                                    <i class="bi bi-rulers text-success"></i>
+                                    <strong>Площ:</strong> @property.Area m²
+                                </li>
+                                <li class="mb-2">
+                                    <i class="bi bi-building text-success"></i>
+                                    <strong>Етаж:</strong> @property.Floor / @property.TotalFloors
+                                </li>
+                                @if (property.BuildingType != null)
+                                {
+                                    <li class="mb-2">
+                                        <i class="bi bi-house-fill text-success"></i>
+                                        <strong>Тип:</strong> @property.BuildingType.Name
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                        <div class="card-footer bg-light">
+                            <div class="d-grid gap-2">
+                                <a asp-action="Details" asp-route-id="@property.Id"
+                                   class="btn btn-outline-success btn-sm">
+                                    <i class="bi bi-eye"></i> Детайли
+                                </a>
+                                <div class="btn-group" role="group">
+                                    <a asp-action="Edit" asp-route-id="@property.Id"
+                                       class="btn btn-outline-warning btn-sm">
+                                        <i class="bi bi-pencil"></i> Редактирай
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@property.Id"
+                                       class="btn btn-outline-danger btn-sm">
+                                        <i class="bi bi-trash"></i> Изтрий
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Pagination -->
+        @if (Model.TotalPages > 1)
+        {
+            <nav aria-label="Навигация по страници" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+                        <a class="page-link"
+                           asp-action="Search"
+                           asp-route-page="@(Model.PageNumber - 1)"
+                           asp-route-pageSize="@Model.PageSize"
+                           asp-route-minPrice="@ViewBag.MinPrice"
+                           asp-route-maxPrice="@ViewBag.MaxPrice"
+                           asp-route-quarterName="@ViewBag.QuarterName"
+                           asp-route-buildingType="@ViewBag.BuildingType">
+                            <i class="bi bi-chevron-left"></i> Предишна
+                        </a>
+                    </li>
+
+                    @{
+                        var startPage = Math.Max(1, Model.PageNumber - 2);
+                        var endPage = Math.Min(Model.TotalPages, Model.PageNumber + 2);
+                    }
+
+                    @for (int i = startPage; i <= endPage; i++)
+                    {
+                        <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                            <a class="page-link"
+                               asp-action="Search"
+                               asp-route-page="@i"
+                               asp-route-pageSize="@Model.PageSize"
+                               asp-route-minPrice="@ViewBag.MinPrice"
+                               asp-route-maxPrice="@ViewBag.MaxPrice"
+                               asp-route-quarterName="@ViewBag.QuarterName"
+                               asp-route-buildingType="@ViewBag.BuildingType">
+                                @i
+                            </a>
+                        </li>
+                    }
+
+                    <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+                        <a class="page-link"
+                           asp-action="Search"
+                           asp-route-page="@(Model.PageNumber + 1)"
+                           asp-route-pageSize="@Model.PageSize"
+                           asp-route-minPrice="@ViewBag.MinPrice"
+                           asp-route-maxPrice="@ViewBag.MaxPrice"
+                           asp-route-quarterName="@ViewBag.QuarterName"
+                           asp-route-buildingType="@ViewBag.BuildingType">
+                            Следваща <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        }
+    }
+</div>

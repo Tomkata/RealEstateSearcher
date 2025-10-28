@@ -1,0 +1,57 @@
+﻿@model dynamic
+
+@{
+    var pageNumber = (int)Model.PageNumber;
+    var totalPages = (int)Model.TotalPages;
+    var pageSize = (int)Model.PageSize;
+    var hasPrevious = (bool)Model.HasPreviousPage;
+    var hasNext = (bool)Model.HasNextPage;
+
+    var actionName = ViewContext.RouteData.Values["action"]?.ToString() ?? "Index";
+    var controllerName = ViewContext.RouteData.Values["controller"]?.ToString() ?? "Properties";
+}
+
+@if (totalPages > 1)
+{
+    <nav aria-label="Pagination">
+        <ul class="pagination justify-content-center">
+            <li class="page-item @(hasPrevious ? "" : "disabled")">
+                <a class="page-link"
+                   asp-controller="@controllerName"
+                   asp-action="@actionName"
+                   asp-route-page="@(pageNumber - 1)"
+                   asp-route-pageSize="@pageSize">
+                    <i class="bi bi-chevron-left"></i> Предишна
+                </a>
+            </li>
+
+            @{
+                var startPage = Math.Max(1, pageNumber - 2);
+                var endPage = Math.Min(totalPages, pageNumber + 2);
+            }
+
+            @for (int i = startPage; i <= endPage; i++)
+            {
+                <li class="page-item @(i == pageNumber ? "active" : "")">
+                    <a class="page-link"
+                       asp-controller="@controllerName"
+                       asp-action="@actionName"
+                       asp-route-page="@i"
+                       asp-route-pageSize="@pageSize">
+                        @i
+                    </a>
+                </li>
+            }
+
+            <li class="page-item @(hasNext ? "" : "disabled")">
+                <a class="page-link"
+                   asp-controller="@controllerName"
+                   asp-action="@actionName"
+                   asp-route-page="@(pageNumber + 1)"
+                   asp-route-pageSize="@pageSize">
+                    Следваща <i class="bi bi-chevron-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+}

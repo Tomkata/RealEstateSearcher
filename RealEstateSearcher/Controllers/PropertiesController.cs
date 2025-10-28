@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using RealEstateSearcher.Core.Models;
+using RealEstateSearcher.Services.Dtos;
 using RealEstateSearcher.Services.Interfaces;
-using RealEstateSearcher.Services.Services;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace RealEstateSearcher.Web.Controllers
 {
@@ -10,23 +10,28 @@ namespace RealEstateSearcher.Web.Controllers
     {
         private readonly IPropertyService _propertyService;
         private readonly ILogger<PropertiesController> _logger;
-        public PropertiesController(IPropertyService propertyService,
-                                    ILogger<PropertiesController> logger)
+
+        public PropertiesController(
+            IPropertyService propertyService,
+            ILogger<PropertiesController> logger)
         {
-            this._propertyService = propertyService;
-            this._logger = logger;
+            _propertyService = propertyService;
+            _logger = logger;
         }
 
-        public async Task<IActionResult> Index()
+        // GET: /Properties/Index
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 12)
         {
-            var properties = _propertyService.GetAllPropertiesAsync();
-
-            return View(properties);
+            _logger.LogInformation("Loading properties list, page {Page}", page);
+            var pagedResult = await _propertyService.GetPropertiesPagedAsync(page, pageSize);
+            return View(pagedResult);
         }
 
+        // GET: /Properties/Details/5
         public async Task<IActionResult> Details(Guid id)
-        {   
-            var property = await _propertyService.GetPropertyByIdAsync(id);       
+        {
+            _logger.LogInformation("Loading property details for {PropertyId}", id);
+            var property = await _propertyService.GetPropertyByIdAsync(id);
 
             if (property == null)
             {
@@ -37,34 +42,37 @@ namespace RealEstateSearcher.Web.Controllers
             return View(property);
         }
 
-        public async Task<IActionResult> Create()
+        // GET: /Properties/Create
+        public IActionResult Create()
         {
             return View();
         }
 
-
-
+        // POST: /Properties/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-               string title,
-               decimal price,
-               int area,
-               int floor,
-               int totalFloors,
-               string quarterName,
-               string? buildingTypeName)
+            string title,
+            decimal price,
+            int area,
+            int floor,
+            int totalFloors,
+            string quarterName,
+            string? buildingTypeName)
         {
             try
             {
-                var property = _propertyService.AddPropertyAsync(
-               title,
-               price,
-               area,
-               floor,
-               totalFloors,
-               quarterName,
-               buildingTypeName);
+                _logger.LogInformation("Creating new property: {Title}", title);
+
+                // ✅ Добавен await
+                var property = await _propertyService.AddPropertyAsync(
+                    title,
+                    price,
+                    area,
+                    floor,
+                    totalFloors,
+                    quarterName,
+                    buildingTypeName);
 
                 _logger.LogInformation("Property {PropertyId} created successfully", property.Id);
 
@@ -72,25 +80,32 @@ namespace RealEstateSearcher.Web.Controllers
             }
             catch (Exception ex)
             {
-
                 _logger.LogError(ex, "Error creating property");
                 ModelState.AddModelError("", "Възникна грешка при създаването на имота");
                 return View();
             }
         }
 
+        // GET: /Properties/Edit/5
         public async Task<IActionResult> Edit(Guid id)
         {
-            var property = _propertyService.GetPropertyByIdAsync(id);
+            _logger.LogInformation("Loading property for edit: {PropertyId}", id);
+
+            // ✅ Добавен await
+            var property = await _propertyService.GetPropertyByIdAsync(id);
+
             if (property == null)
             {
                 _logger.LogWarning("Property {PropertyId} not found", id);
                 return NotFound();
             }
+
             return View(property);
         }
 
+        // POST: /Properties/Edit/5
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
             Guid id,
             string title,
@@ -103,28 +118,36 @@ namespace RealEstateSearcher.Web.Controllers
         {
             try
             {
-               var property =  await _propertyService.UpdatePropertyAsync(
+                _logger.LogInformation("Updating property {PropertyId}", id);
+
+                var property = await _propertyService.UpdatePropertyAsync(
                     id, title, price, area, floor, totalFloors, quarterName, buildingTypeName);
 
                 if (property == null)
                 {
+                    _logger.LogWarning("Property {PropertyId} not found", id);
                     return NotFound();
-                }   
+                }
 
-                return RedirectToAction(nameof(Details),new {id }); 
+                _logger.LogInformation("Property {PropertyId} updated successfully", id);
+
+                return RedirectToAction(nameof(Details), new { id });
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Error updating property { PropertyId}", id);
+                _logger.LogError(ex, "Error updating property {PropertyId}", id);
                 ModelState.AddModelError("", "Възникна грешка при актуализирането на имота");
                 return View();
             }
         }
 
-       
+        // GET: /Properties/Delete/5
         public async Task<IActionResult> Delete(Guid id)
         {
-            var property = _propertyService.GetPropertyByIdAsync(id);
+            _logger.LogInformation("Loading property for delete: {PropertyId}", id);
+
+            // ✅ Добавен await
+            var property = await _propertyService.GetPropertyByIdAsync(id);
 
             if (property == null)
             {
@@ -135,17 +158,24 @@ namespace RealEstateSearcher.Web.Controllers
             return View(property);
         }
 
-        [HttpPost,ActionName("Delete")]
-        [ValidateAntiForgeryToken]//For security
+        // POST: /Properties/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
             try
             {
+                _logger.LogInformation("Deleting property {PropertyId}", id);
+
                 var result = await _propertyService.DeletePropertyAsync(id);
+
                 if (!result)
                 {
+                    _logger.LogWarning("Property {PropertyId} not found", id);
                     return NotFound();
                 }
+
+                _logger.LogInformation("Property {PropertyId} deleted successfully", id);
 
                 return RedirectToAction(nameof(Index));
             }
@@ -156,43 +186,88 @@ namespace RealEstateSearcher.Web.Controllers
             }
         }
 
-        public async Task<IActionResult> Search(Guid id)
+        public async Task<IActionResult> Search(
+            decimal? minPrice,
+            decimal? maxPrice,
+            string? quarterName,
+            string? buildingType,
+            int page = 1,
+            int pageSize = 12)
         {
-            var property = _propertyService.GetPropertyByIdAsync(id);
-
-            if (property == null)
+            if (!minPrice.HasValue && !maxPrice.HasValue &&
+                string.IsNullOrWhiteSpace(quarterName) &&
+                string.IsNullOrWhiteSpace(buildingType))
             {
-                _logger.LogWarning("Property {PropertyId} not found", id);
-                return NotFound();
+                return View();
             }
 
-            return View(property);
-        }
-        public IActionResult Search()
-        {
-            return View();
-        }
+            _logger.LogInformation("Searching properties with filters");
 
-        [HttpPost]
-        public async Task<IActionResult> Search(decimal? minPrice, decimal? maxPrice, string? quarterName)
-        {
-            IEnumerable<RealEstateSearcher.Core.Models.Property> properties;
+            PagedResult<Property> pagedResult;
 
+            // Търсене по цена
             if (minPrice.HasValue && maxPrice.HasValue)
             {
-                properties = await _propertyService.SearchByPriceRangeAsync(minPrice.Value, maxPrice.Value);
+                _logger.LogInformation("Searching by price range: {Min}-{Max}", minPrice, maxPrice);
+
+                pagedResult = await _propertyService.SearchByPriceRangePagedAsync(
+                    (int)minPrice.Value,
+                    (int)maxPrice.Value,
+                    page,
+                    pageSize);
+
+                ViewBag.SearchType = "price";
+                ViewBag.MinPrice = minPrice;
+                ViewBag.MaxPrice = maxPrice;
             }
+            // Търсене по квартал
+            // Търсене по квартал
             else if (!string.IsNullOrWhiteSpace(quarterName))
             {
-                properties = await _propertyService.GetPropertiesByQuarterAsync(quarterName);
+                var allProperties = await _propertyService.GetPropertiesByQuarterAsync(quarterName);
+
+                pagedResult = new PagedResult<Property>
+                {
+                    Items = allProperties
+                        .OrderBy(p => p.Price)  // ← ОТ НИСКА КЪМ ВИСОКА
+                        .Skip((page - 1) * pageSize)
+                        .Take(pageSize)
+                        .ToList(),
+                    PageNumber = page,
+                    PageSize = pageSize,
+                    TotalCount = allProperties.Count()
+                };
+
+                ViewBag.SearchType = "quarter";
+                ViewBag.QuarterName = quarterName;
+            }
+            // Търсене по тип сграда
+            else if (!string.IsNullOrWhiteSpace(buildingType))
+            {
+                var allProperties = await _propertyService.GetPropertiesByBuildingTypeAsync(buildingType);
+
+                pagedResult = new PagedResult<Property>
+                {
+                    Items = allProperties
+                        .OrderBy(p => p.Price)  // ← ОТ НИСКА КЪМ ВИСОКА
+                        .Skip((page - 1) * pageSize)
+                        .Take(pageSize)
+                        .ToList(),
+                    PageNumber = page,
+                    PageSize = pageSize,
+                    TotalCount = allProperties.Count()
+                };
+
+                ViewBag.SearchType = "buildingType";
+                ViewBag.BuildingType = buildingType;
             }
             else
             {
-                properties = await _propertyService.GetAllPropertiesAsync();
+                pagedResult = await _propertyService.GetPropertiesPagedAsync(page, pageSize);
+                ViewBag.SearchType = "all";
             }
 
-            return View("Index",properties);
+            return View("SearchResults", pagedResult);
         }
-
     }
 }

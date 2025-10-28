@@ -194,34 +194,24 @@ namespace RealEstateSearcher.Services.Services
 
 
         public async Task<PagedResult<Property>> SearchByPriceRangePagedAsync(
-     int minPrice,
-     int maxPrice,
-     int pageNumber,
-     int pageSize)
+            int minPrice,
+            int maxPrice,
+            int pageNumber,
+            int pageSize)
         {
-            _logger.LogInformation("Searching by price range: {Min}-{Max}, page {Page}",
-                minPrice, maxPrice, pageNumber);
-
-            // Валидация
-            if (pageNumber < 1) pageNumber = 1;
-            if (pageSize < 1) pageSize = 12;
-            if (pageSize > 100) pageSize = 100;
-
-            // Общ брой имоти
             var totalCount = await _context.Properties
-                .Where(x => x.Price >= minPrice && x.Price <= maxPrice)
-                .CountAsync();
+              .Where(x => x.Price >= minPrice && x.Price <= maxPrice)
+              .CountAsync();
 
-            // Взимане на имотите
             var properties = await _context.Properties
-                .AsNoTracking()
-                .Include(x => x.Quarter)
-                .Include(x => x.BuildingType)
-                .Where(x => x.Price >= minPrice && x.Price <= maxPrice)
-                .OrderBy(x => x.Price)  // ← ОТ НИСКА КЪМ ВИСОКА (ascending)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+              .AsNoTracking()
+              .Include(x => x.Quarter)
+              .Include(x => x.BuildingType)
+              .Where(x => x.Price >= minPrice && x.Price <= maxPrice)
+              .OrderByDescending(x => x.Price)
+              .Skip((pageNumber - 1) * pageSize)
+              .Take(pageSize)
+              .ToListAsync();
 
             return new PagedResult<Property>
             {
@@ -230,6 +220,7 @@ namespace RealEstateSearcher.Services.Services
                 PageSize = pageSize,
                 TotalCount = totalCount
             };
+
         }
 
         public async Task<IEnumerable<Property>> SearchByPriceRangeAsync(decimal minPrice, decimal maxPrice)
@@ -241,7 +232,7 @@ namespace RealEstateSearcher.Services.Services
                 .Include(x => x.Quarter)
                 .Include(x => x.BuildingType)
                 .Where(x => x.Price >= minPrice && x.Price <= maxPrice)
-                .OrderBy(x=>x.Price)
+                .OrderByDescending(x=>x.Price)
                 .ToListAsync();
 
             if (!properties.Any())
@@ -335,22 +326,24 @@ namespace RealEstateSearcher.Services.Services
 
         public async Task<PagedResult<Property>> GetPropertiesPagedAsync(int pageNumber = 1, int pageSize = 12)
         {
-            _logger.LogInformation("Getting properties page {PageNumber} with size {PageSize}", pageNumber, pageSize);
-
             if (pageNumber < 1) pageNumber = 1;
-            if (pageSize < 1) pageSize = 12;
+            if (pageSize < 1) pageSize = 1;
             if (pageSize > 100) pageSize = 100;
+
 
             var totalCount = await _context.Properties.CountAsync();
 
+
+            //Total properties of current page
             var properties = await _context.Properties
                 .AsNoTracking()
-                .Include(x => x.Quarter)
-                .Include(x => x.BuildingType)
-                .OrderBy(x => x.Price)  // ← ОТ НИСКА КЪМ ВИСОКА
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+                .Where(x => x.BuildingTypeId != null)
+                 .Include(x => x.Quarter)
+                 .Include(x => x.BuildingType)
+                 .OrderByDescending(x => x.Price)
+                 .Skip((pageNumber - 1) * pageSize)
+                 .Take(pageSize)
+                 .ToListAsync();
 
             return new PagedResult<Property>
             {
