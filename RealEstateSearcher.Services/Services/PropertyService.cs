@@ -202,12 +202,10 @@ namespace RealEstateSearcher.Services.Services
             _logger.LogInformation("Searching by price range: {Min}-{Max}, page {Page}",
                 minPrice, maxPrice, pageNumber);
 
-            // Валидация
             if (pageNumber < 1) pageNumber = 1;
             if (pageSize < 1) pageSize = 12;
             if (pageSize > 100) pageSize = 100;
 
-            // Общ брой имоти
             var totalCount = await _context.Properties
                 .Where(x => x.Price >= minPrice && x.Price <= maxPrice)
                 .CountAsync();
@@ -218,7 +216,7 @@ namespace RealEstateSearcher.Services.Services
                 .Include(x => x.Quarter)
                 .Include(x => x.BuildingType)
                 .Where(x => x.Price >= minPrice && x.Price <= maxPrice)
-                .OrderBy(x => x.Price)  // ← ОТ НИСКА КЪМ ВИСОКА (ascending)
+                .OrderBy(x => x.Price)  
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();

@@ -19,15 +19,12 @@ namespace RealEstateSearcher.Web.Controllers
             _logger = logger;
         }
 
-        // GET: /Properties/Index
         public async Task<IActionResult> Index(int page = 1, int pageSize = 12)
         {
             _logger.LogInformation("Loading properties list, page {Page}", page);
             var pagedResult = await _propertyService.GetPropertiesPagedAsync(page, pageSize);
             return View(pagedResult);
         }
-
-        // GET: /Properties/Details/5
         public async Task<IActionResult> Details(Guid id)
         {
             _logger.LogInformation("Loading property details for {PropertyId}", id);
@@ -42,13 +39,11 @@ namespace RealEstateSearcher.Web.Controllers
             return View(property);
         }
 
-        // GET: /Properties/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: /Properties/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
@@ -64,7 +59,6 @@ namespace RealEstateSearcher.Web.Controllers
             {
                 _logger.LogInformation("Creating new property: {Title}", title);
 
-                // ✅ Добавен await
                 var property = await _propertyService.AddPropertyAsync(
                     title,
                     price,
@@ -86,7 +80,7 @@ namespace RealEstateSearcher.Web.Controllers
             }
         }
 
-        // GET: /Properties/Edit/5
+    
         public async Task<IActionResult> Edit(Guid id)
         {
             _logger.LogInformation("Loading property for edit: {PropertyId}", id);
@@ -103,7 +97,7 @@ namespace RealEstateSearcher.Web.Controllers
             return View(property);
         }
 
-        // POST: /Properties/Edit/5
+     
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
@@ -141,12 +135,12 @@ namespace RealEstateSearcher.Web.Controllers
             }
         }
 
-        // GET: /Properties/Delete/5
+  
         public async Task<IActionResult> Delete(Guid id)
         {
             _logger.LogInformation("Loading property for delete: {PropertyId}", id);
 
-            // ✅ Добавен await
+          
             var property = await _propertyService.GetPropertyByIdAsync(id);
 
             if (property == null)
@@ -229,7 +223,7 @@ namespace RealEstateSearcher.Web.Controllers
                 pagedResult = new PagedResult<Property>
                 {
                     Items = allProperties
-                        .OrderBy(p => p.Price)  // ← ОТ НИСКА КЪМ ВИСОКА
+                        .OrderBy(p => p.Price)  
                         .Skip((page - 1) * pageSize)
                         .Take(pageSize)
                         .ToList(),
@@ -249,7 +243,7 @@ namespace RealEstateSearcher.Web.Controllers
                 pagedResult = new PagedResult<Property>
                 {
                     Items = allProperties
-                        .OrderBy(p => p.Price)  // ← ОТ НИСКА КЪМ ВИСОКА
+                        .OrderBy(p => p.Price)  
                         .Skip((page - 1) * pageSize)
                         .Take(pageSize)
                         .ToList(),

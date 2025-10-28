@@ -1,0 +1,191 @@
+﻿@{
+    ViewData["Title"] = "Добави нов имот";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">
+                        <i class="bi bi-plus-circle"></i> Добави нов имот
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                        <div class="mb-3">
+                            <label for="title" class="form-label">
+                                <i class="bi bi-card-text"></i> Заглавие *
+                            </label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="title"
+                                   name="title"
+                                   placeholder="напр. Двустаен апартамент в центъра"
+                                   required
+                                   maxlength="200" />
+                            <div class="form-text">Въведете описателно заглавие на имота</div>
+                        </div>
+
+                        <!-- Цена и Площ -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="price" class="form-label">
+                                    <i class="bi bi-currency-exchange"></i> Цена (лв) *
+                                </label>
+                                <input type="number"
+                                       class="form-control"
+                                       id="price"
+                                       name="price"
+                                       placeholder="150000"
+                                       step="0.01"
+                                       min="0"
+                                       required />
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="area" class="form-label">
+                                    <i class="bi bi-rulers"></i> Площ (m²) *
+                                </label>
+                                <input type="number"
+                                       class="form-control"
+                                       id="area"
+                                       name="area"
+                                       placeholder="75"
+                                       min="1"
+                                       max="10000"
+                                       required />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="floor" class="form-label">
+                                    <i class="bi bi-building"></i> Етаж *
+                                </label>
+                                <input type="number"
+                                       class="form-control"
+                                       id="floor"
+                                       name="floor"
+                                       placeholder="3"
+                                       min="0"
+                                       max="100"
+                                       required />
+                                <div class="form-text">0 за партер</div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="totalFloors" class="form-label">
+                                    <i class="bi bi-building"></i> Общо етажи *
+                                </label>
+                                <input type="number"
+                                       class="form-control"
+                                       id="totalFloors"
+                                       name="totalFloors"
+                                       placeholder="6"
+                                       min="1"
+                                       max="100"
+                                       required />
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="quarterName" class="form-label">
+                                <i class="bi bi-geo-alt"></i> Квартал *
+                            </label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="quarterName"
+                                   name="quarterName"
+                                   placeholder="напр. Лозенец"
+                                   list="quarters"
+                                   required
+                                   maxlength="100" />
+                            <datalist id="quarters">
+                                <option value="Лозенец"></option>
+                                <option value="Център"></option>
+                                <option value="Младост"></option>
+                                <option value="Люлин"></option>
+                                <option value="Драгалевци"></option>
+                                <option value="Витоша"></option>
+                                <option value="Бояна"></option>
+                                <option value="Подуяне"></option>
+                                <option value="Банишора"></option>
+                                <option value="Овча купел"></option>
+                            </datalist>
+                            <div class="form-text">
+                                Ако кварталът не съществува, ще бъде създаден автоматично
+                            </div>
+                        </div>
+
+                        <!-- Тип сграда -->
+                        <div class="mb-3">
+                            <label for="buildingTypeName" class="form-label">
+                                <i class="bi bi-house"></i> Тип сграда (незадължително)
+                            </label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="buildingTypeName"
+                                   name="buildingTypeName"
+                                   placeholder="напр. Тухла, Панел, ЕПК"
+                                   list="buildingTypes"
+                                   maxlength="50" />
+                            <datalist id="buildingTypes">
+                                <option value="Тухла"></option>
+                                <option value="Панел"></option>
+                                <option value="ЕПК"></option>
+                                <option value="ТЕЦ"></option>
+                                <option value="Нова сграда"></option>
+                            </datalist>
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <!-- Бутони -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Отказ
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-check-circle"></i> Създай имот
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="alert alert-info mt-4">
+                <h5><i class="bi bi-info-circle"></i> Полезна информация:</h5>
+                <ul class="mb-0">
+                    <li>Полетата маркирани с * са задължителни</li>
+                    <li>Цената на m² ще се изчисли автоматично</li>
+                    <li>Можете да въведете нов квартал или тип сграда</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        const priceInput = document.getElementById('price');
+        const areaInput = document.getElementById('area');
+
+        function updatePricePerArea() {
+            const price = parseFloat(priceInput.value);
+            const area = parseFloat(areaInput.value);
+
+            if (price > 0 && area > 0) {
+                const pricePerArea = (price / area).toFixed(0);
+                console.log(`Цена за m²: ${pricePerArea} лв`);
+            }
+        }
+
+        priceInput?.addEventListener('input', updatePricePerArea);
+        areaInput?.addEventListener('input', updatePricePerArea);
+    </script>
+}
