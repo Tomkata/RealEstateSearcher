@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using RealEstateSearcher.Core.Models;
 using RealEstateSearcher.Infrastructure;
 using RealEstateSearcher.Services.Dtos;
+using RealEstateSearcher.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -275,6 +276,24 @@ namespace RealEstateSearcher.Services.Services
                 await _context.Entry(property).Reference(x => x.BuildingType).LoadAsync();
             }
             return property;
+        }
+
+        public async Task<IEnumerable<Property>> GetPropertiesByQuarterAsync(string quarterName)
+        {
+            var properties = await _context.Properties
+                .AsNoTracking()
+                .Include(x => x.Quarter)
+                .Include(x => x.BuildingType)
+                .Where(x => x.Quarter.Name == quarterName)
+                .OrderByDescending(x => x.Price)
+                .ToListAsync();
+
+            if (!properties.Any())
+            {
+                _logger.LogWarning("No properties found in quarter: {QuarterName}", quarterName);
+            }
+
+            return properties;
         }
     }
 }
