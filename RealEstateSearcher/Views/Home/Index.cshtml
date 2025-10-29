@@ -1,8 +1,259 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Начало";
+    ViewData["FullWidth"] = true;  // ← Махни container-а
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-overlay">
+        <div class="container">
+            <div class="row align-items-center min-vh-75">
+                <div class="col-lg-8 mx-auto text-center text-white">
+                    <h1 class="display-3 fw-bold mb-4 animate-fade-in">
+                        Намерете вашия <span class="text-gradient">мечтан дом</span>
+                    </h1>
+                    <p class="lead mb-5 animate-fade-in-delay">
+                        Над 1000+ имота в цяла България. Започнете търсенето днес!
+                    </p>
+
+                    <!-- Quick Search Form -->
+                    <div class="hero-search-box animate-slide-up">
+                        <form asp-controller="Properties" asp-action="Search" method="get" class="row g-3">
+                            <div class="col-md-4">
+                                <input type="number" class="form-control form-control-lg"
+                                       name="minPrice" placeholder="Мин. цена (лв)" />
+                            </div>
+                            <div class="col-md-4">
+                                <input type="number" class="form-control form-control-lg"
+                                       name="maxPrice" placeholder="Макс. цена (лв)" />
+                            </div>
+                            <div class="col-md-4">
+                                <button type="submit" class="btn btn-primary btn-lg w-100">
+                                    <i class="bi bi-search"></i> Търси
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- CTA Buttons -->
+                    <div class="mt-4 animate-fade-in-delay-2">
+                        <a asp-controller="Properties" asp-action="Index" class="btn btn-light btn-lg me-3">
+                            <i class="bi bi-list-ul"></i> Всички имоти
+                        </a>
+                        <a asp-controller="Properties" asp-action="Create" class="btn btn-outline-light btn-lg">
+                            <i class="bi bi-plus-circle"></i> Добави имот
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="display-5 fw-bold mb-3">Защо да изберете нас?</h2>
+                <p class="lead text-muted">
+                    Ние предлагаме най-добрата платформа за търсене на имоти в България
+                </p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Feature 1 -->
+            <div class="col-md-4">
+                <div class="feature-card text-center p-4">
+                    <div class="feature-icon mb-3">
+                        <i class="bi bi-search fs-1 text-primary"></i>
+                    </div>
+                    <h4 class="mb-3">Лесно търсене</h4>
+                    <p class="text-muted">
+                        Филтрирайте по цена, квартал, площ и много други критерии
+                    </p>
+                </div>
+            </div>
+
+            <!-- Feature 2 -->
+            <div class="col-md-4">
+                <div class="feature-card text-center p-4">
+                    <div class="feature-icon mb-3">
+                        <i class="bi bi-graph-up fs-1 text-success"></i>
+                    </div>
+                    <h4 class="mb-3">Актуални цени</h4>
+                    <p class="text-muted">
+                        Всички имоти с реални и актуализирани цени
+                    </p>
+                </div>
+            </div>
+
+            <!-- Feature 3 -->
+            <div class="col-md-4">
+                <div class="feature-card text-center p-4">
+                    <div class="feature-icon mb-3">
+                        <i class="bi bi-shield-check fs-1 text-info"></i>
+                    </div>
+                    <h4 class="mb-3">Проверени оферти</h4>
+                    <p class="text-muted">
+                        Всички имоти са проверени и валидирани от нашия екип
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="stats-section py-5 bg-light">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-3 mb-4">
+                <div class="stat-box">
+                    <h2 class="display-4 fw-bold text-primary">1000+</h2>
+                    <p class="text-muted">Имота</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="stat-box">
+                    <h2 class="display-4 fw-bold text-success">50+</h2>
+                    <p class="text-muted">Квартала</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="stat-box">
+                    <h2 class="display-4 fw-bold text-info">500+</h2>
+                    <p class="text-muted">Потребители</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="stat-box">
+                    <h2 class="display-4 fw-bold text-warning">4.8</h2>
+                    <p class="text-muted">Рейтинг</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="display-5 fw-bold mb-4">Готови да намерите перфектния имот?</h2>
+                <p class="lead mb-4">
+                    Присъединете се към хиляди доволни клиенти и намерете мечтания дом днес!
+                </p>
+                <a asp-controller="Properties" asp-action="Search" class="btn btn-primary btn-lg">
+                    <i class="bi bi-search"></i> Започни търсенето сега
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    /* Hero Section */
+    .hero-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        position: relative;
+        overflow: hidden;
+        padding: 100px 0;
+    }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+    .hero-overlay {
+        position: relative;
+        z-index: 1;
+    }
+
+    .min-vh-75 {
+        min-height: 75vh;
+    }
+
+    .text-gradient {
+        background: linear-gradient(135deg, #ffffff 0%, #f093fb 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .hero-search-box {
+        background: rgba(255, 255, 255, 0.95);
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(10px);
+    }
+
+        .hero-search-box .form-control {
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+        }
+
+            .hero-search-box .form-control:focus {
+                border-color: #667eea;
+                box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            }
+
+    /* Animations */
+    .animate-fade-in {
+        animation: fadeIn 1s ease-in;
+    }
+
+    .animate-fade-in-delay {
+        animation: fadeIn 1s ease-in 0.3s backwards;
+    }
+
+    .animate-fade-in-delay-2 {
+        animation: fadeIn 1s ease-in 0.6s backwards;
+    }
+
+    .animate-slide-up {
+        animation: slideUp 1s ease-out 0.4s backwards;
+    }
+
+keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .feature-card {
+        background: white;
+        border-radius: 15px;
+        transition: all 0.3s ease;
+        height: 100%;
+        border: 2px solid transparent;
+    }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-s
