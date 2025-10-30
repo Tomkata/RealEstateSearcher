@@ -135,49 +135,22 @@ namespace RealEstateSearcher.Web.Controllers
             }
         }
 
-  
         public async Task<IActionResult> Delete(Guid id)
         {
-            _logger.LogInformation("Loading property for delete: {PropertyId}", id);
-
-          
             var property = await _propertyService.GetPropertyByIdAsync(id);
-
             if (property == null)
-            {
-                _logger.LogWarning("Property {PropertyId} not found", id);
                 return NotFound();
-            }
 
             return View(property);
         }
 
-        // POST: /Properties/Delete/5
+        // POST: /Properties/Delete/{id}
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            try
-            {
-                _logger.LogInformation("Deleting property {PropertyId}", id);
-
-                var result = await _propertyService.DeletePropertyAsync(id);
-
-                if (!result)
-                {
-                    _logger.LogWarning("Property {PropertyId} not found", id);
-                    return NotFound();
-                }
-
-                _logger.LogInformation("Property {PropertyId} deleted successfully", id);
-
-                return RedirectToAction(nameof(Index));
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error deleting property {PropertyId}", id);
-                return RedirectToAction(nameof(Details), new { id });
-            }
+            await _propertyService.DeletePropertyAsync(id);
+            return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> Search(

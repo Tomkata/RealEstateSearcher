@@ -215,7 +215,7 @@ namespace RealEstateSearcher.Services.Services
                 .AsNoTracking()
                 .Include(x => x.Quarter)
                 .Include(x => x.BuildingType)
-                .Where(x => x.Price >= minPrice && x.Price <= maxPrice)
+                .Where(x => x.Price >= minPrice && x.Price <= maxPrice && maxPrice>minPrice && maxPrice != default && minPrice!=default)
                 .OrderBy(x => x.Price)  
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
