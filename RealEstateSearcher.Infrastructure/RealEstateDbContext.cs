@@ -23,9 +23,27 @@ namespace RealEstateSearcher.Infrastructure
 
         public DbSet<BuildingType> BuildingTypes { get; set; }
 
+        public DbSet<PropertyImage> PropertyImages { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Property>()
+                .Property(p => p.Price)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<PropertyImage>(entity =>
+            {
+                entity.HasOne(pi => pi.Property)
+                      .WithMany(p => p.Images)
+                      .HasForeignKey(pi => pi.PropertyId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+
             modelBuilder.Entity<Property>(entity =>
             {
 

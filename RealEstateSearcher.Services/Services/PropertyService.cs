@@ -19,13 +19,13 @@ namespace RealEstateSearcher.Services.Services
         }
 
         public async Task<Property> AddPropertyAsync(
-    string title,
-    decimal price,
-    int area,
-    int floor,
-    int totalFloors,
-    string quarterName,
-    string? buildingTypeName)
+            string title,
+            decimal price,
+            int area,
+            int floor,
+            int totalFloors,
+            string quarterName,
+            string? buildingTypeName)
         {
             _logger.LogInformation("Adding new property: {Title} in {Quarter}", title, quarterName);
 
@@ -37,7 +37,7 @@ namespace RealEstateSearcher.Services.Services
                 _logger.LogInformation("Quarter {QuarterName} not found, creating new one", quarterName);
                 quarter = new Quarter { Name = quarterName };
                 _context.Quarters.Add(quarter);
-                await _context.SaveChangesAsync();  
+                await _context.SaveChangesAsync();
             }
 
             Guid? buildingTypeId = null;
@@ -64,8 +64,8 @@ namespace RealEstateSearcher.Services.Services
                 Area = area,
                 Floor = floor,
                 TotalFloors = totalFloors,
-                QuarterId = quarter.Id,          
-                BuildingTypeId = buildingTypeId   
+                QuarterId = quarter.Id,
+                BuildingTypeId = buildingTypeId
             };
 
             await _context.Properties.AddAsync(property);
@@ -91,40 +91,38 @@ namespace RealEstateSearcher.Services.Services
         {
             _logger.LogInformation("Deleting property {PropertyId}", id);
 
-            var property = await _context.Properties
-                .FindAsync(id);
+            var property = await _context.Properties.FindAsync(id);
 
-
-            if (property == null) 
+            if (property == null)
             {
                 _logger.LogWarning("Property {PropertyId} not found", id);
                 return false;
-            } 
+            }
 
             _context.Properties.Remove(property);
-            await  _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
             _logger.LogInformation("Property {PropertyId} deleted successfully", id);
             return true;
-
         }
 
         public async Task<IEnumerable<Property>> GetAllPropertiesAsync()
         {
             return await _context.Properties
-                            .AsNoTracking()
-                            .Include(x => x.Quarter)
-                            .Include(x=>x.BuildingType)
-                            .OrderByDescending(x=>x.Price)
-                            .ToListAsync();
+                .AsNoTracking()
+                .Include(x => x.Quarter)
+                .Include(x => x.BuildingType)
+                .Include(x => x.Images) 
+                .OrderByDescending(x => x.Price)
+                .ToListAsync();
         }
 
-        public async Task<IEnumerable<QuarterAveragePrice>> GetAveragePricesByQuartersAsync()  
+        public async Task<IEnumerable<QuarterAveragePrice>> GetAveragePricesByQuartersAsync()
         {
             _logger.LogInformation("Calculating average prices by quarters");
 
             var result = await _context.Properties
-                .AsNoTracking()  
+                .AsNoTracking()
                 .Include(x => x.Quarter)
                 .GroupBy(x => x.Quarter.Name)
                 .Select(x => new QuarterAveragePrice
@@ -142,14 +140,15 @@ namespace RealEstateSearcher.Services.Services
         public async Task<IEnumerable<Property>> GetPropertiesByBuildingTypeAsync(string buildingType)
         {
             var properties = await _context.Properties
-                  .AsNoTracking()
-                 .Include(x => x.BuildingType)
-                 .Include(x=>x.Quarter)
-                 .Where(x => x.BuildingType != null && x.BuildingType.Name == buildingType)
-                 .OrderByDescending(x => x.Price)
-                 .ToListAsync();
+                .AsNoTracking()
+                .Include(x => x.BuildingType)
+                .Include(x => x.Quarter)
+                .Include(x => x.Images) 
+                .Where(x => x.BuildingType != null && x.BuildingType.Name == buildingType)
+                .OrderByDescending(x => x.Price)
+                .ToListAsync();
 
-            if(!properties.Any())
+            if (!properties.Any())
             {
                 _logger.LogWarning("No properties found in building type: {BuildingType}", buildingType);
             }
@@ -161,8 +160,9 @@ namespace RealEstateSearcher.Services.Services
         {
             var property = await _context.Properties
                 .AsNoTracking()
-                .Include(x=>x.Quarter)
-                .Include(x=>x.BuildingType)
+                .Include(x => x.Quarter)
+                .Include(x => x.BuildingType)
+                .Include(x => x.Images)  
                 .FirstOrDefaultAsync(x => x.Id == id);
 
             if (property == null)
@@ -179,6 +179,7 @@ namespace RealEstateSearcher.Services.Services
                 .AsNoTracking()
                 .Include(x => x.Quarter)
                 .Include(x => x.BuildingType)
+                .Include(x => x.Images)  
                 .Where(x => x.Quarter.Name == quarterName)
                 .OrderByDescending(x => x.Price)
                 .Take(10)
@@ -186,18 +187,17 @@ namespace RealEstateSearcher.Services.Services
 
             if (!properties.Any())
             {
-                _logger.LogWarning("No properties found in quarter: {QuarterName}", quarterName);  
+                _logger.LogWarning("No properties found in quarter: {QuarterName}", quarterName);
             }
 
-                return properties;
+            return properties;
         }
 
-
         public async Task<PagedResult<Property>> SearchByPriceRangePagedAsync(
-     int minPrice,
-     int maxPrice,
-     int pageNumber,
-     int pageSize)
+            int minPrice,
+            int maxPrice,
+            int pageNumber,
+            int pageSize)
         {
             _logger.LogInformation("Searching by price range: {Min}-{Max}, page {Page}",
                 minPrice, maxPrice, pageNumber);
@@ -210,13 +210,13 @@ namespace RealEstateSearcher.Services.Services
                 .Where(x => x.Price >= minPrice && x.Price <= maxPrice)
                 .CountAsync();
 
-            // Взимане на имотите
             var properties = await _context.Properties
                 .AsNoTracking()
                 .Include(x => x.Quarter)
                 .Include(x => x.BuildingType)
-                .Where(x => x.Price >= minPrice && x.Price <= maxPrice && maxPrice>minPrice && maxPrice != default && minPrice!=default)
-                .OrderBy(x => x.Price)  
+                .Include(x => x.Images)
+                .Where(x => x.Price >= minPrice && x.Price <= maxPrice && maxPrice > minPrice)
+                .OrderBy(x => x.Price)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -232,30 +232,37 @@ namespace RealEstateSearcher.Services.Services
 
         public async Task<IEnumerable<Property>> SearchByPriceRangeAsync(decimal minPrice, decimal maxPrice)
         {
-          
-
             var properties = await _context.Properties
                 .AsNoTracking()
                 .Include(x => x.Quarter)
                 .Include(x => x.BuildingType)
+                .Include(x => x.Images)  
                 .Where(x => x.Price >= minPrice && x.Price <= maxPrice)
-                .OrderBy(x=>x.Price)
+                .OrderBy(x => x.Price)
                 .ToListAsync();
 
             if (!properties.Any())
             {
-                _logger.LogWarning("No properties found in price range: {MinPrice}-{MaxPrice}", minPrice, maxPrice); 
+                _logger.LogWarning("No properties found in price range: {MinPrice}-{MaxPrice}", minPrice, maxPrice);
             }
 
-                return properties;
+            return properties;
         }
 
-        public async Task<Property?> UpdatePropertyAsync(Guid id,string title, decimal price, int area, int floor, int totalFloors, string quarterName, string? buildingTypeName)
+        public async Task<Property?> UpdatePropertyAsync(
+            Guid id,
+            string title,
+            decimal price,
+            int area,
+            int floor,
+            int totalFloors,
+            string quarterName,
+            string? buildingTypeName)
         {
             var property = await _context.Properties
-         .Include(p => p.Quarter)      
-         .Include(p => p.BuildingType)   
-         .FirstOrDefaultAsync(p => p.Id == id);
+                .Include(p => p.Quarter)
+                .Include(p => p.BuildingType)
+                .FirstOrDefaultAsync(p => p.Id == id);
 
             if (property == null)
             {
@@ -265,29 +272,31 @@ namespace RealEstateSearcher.Services.Services
 
             if (property.Quarter.Name != quarterName)
             {
-
                 var quarter = await _context.Quarters
-                     .FirstOrDefaultAsync(x => x.Name == quarterName);
+                    .FirstOrDefaultAsync(x => x.Name == quarterName);
+
                 if (quarter == null)
                 {
                     quarter = new Quarter { Name = quarterName };
                     await _context.Quarters.AddAsync(quarter);
                     await _context.SaveChangesAsync();
                 }
+
                 property.QuarterId = quarter.Id;
             }
-
 
             if (!string.IsNullOrWhiteSpace(buildingTypeName))
             {
                 var buildingType = await _context.BuildingTypes
                     .FirstOrDefaultAsync(x => x.Name == buildingTypeName);
+
                 if (buildingType == null)
                 {
                     buildingType = new BuildingType { Name = buildingTypeName };
                     await _context.BuildingTypes.AddAsync(buildingType);
                     await _context.SaveChangesAsync();
                 }
+
                 property.BuildingTypeId = buildingType.Id;
             }
             else
@@ -310,6 +319,7 @@ namespace RealEstateSearcher.Services.Services
             {
                 await _context.Entry(property).Reference(x => x.BuildingType).LoadAsync();
             }
+
             return property;
         }
 
@@ -319,6 +329,7 @@ namespace RealEstateSearcher.Services.Services
                 .AsNoTracking()
                 .Include(x => x.Quarter)
                 .Include(x => x.BuildingType)
+                .Include(x => x.Images)  
                 .Where(x => x.Quarter.Name == quarterName)
                 .OrderByDescending(x => x.Price)
                 .ToListAsync();
@@ -345,7 +356,8 @@ namespace RealEstateSearcher.Services.Services
                 .AsNoTracking()
                 .Include(x => x.Quarter)
                 .Include(x => x.BuildingType)
-                .OrderBy(x => x.Price)  // ← ОТ НИСКА КЪМ ВИСОКА
+                .Include(x => x.Images) 
+                .OrderBy(x => x.Price)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();

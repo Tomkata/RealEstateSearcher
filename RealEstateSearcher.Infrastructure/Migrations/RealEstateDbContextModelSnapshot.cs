@@ -50,14 +50,26 @@ namespace RealEstateSearcher.Infrastructure.Migrations
                     b.Property<Guid?>("BuildingTypeId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
                     b.Property<int>("Floor")
                         .HasColumnType("int");
 
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<Guid>("QuarterId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("SourceLink")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -74,6 +86,30 @@ namespace RealEstateSearcher.Infrastructure.Migrations
                     b.HasIndex("QuarterId");
 
                     b.ToTable("Properties");
+                });
+
+            modelBuilder.Entity("RealEstateSearcher.Core.Models.PropertyImage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("PropertyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PropertyId");
+
+                    b.ToTable("PropertyImages");
                 });
 
             modelBuilder.Entity("RealEstateSearcher.Core.Models.Quarter", b =>
@@ -110,9 +146,25 @@ namespace RealEstateSearcher.Infrastructure.Migrations
                     b.Navigation("Quarter");
                 });
 
+            modelBuilder.Entity("RealEstateSearcher.Core.Models.PropertyImage", b =>
+                {
+                    b.HasOne("RealEstateSearcher.Core.Models.Property", "Property")
+                        .WithMany("Images")
+                        .HasForeignKey("PropertyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Property");
+                });
+
             modelBuilder.Entity("RealEstateSearcher.Core.Models.BuildingType", b =>
                 {
                     b.Navigation("Properties");
+                });
+
+            modelBuilder.Entity("RealEstateSearcher.Core.Models.Property", b =>
+                {
+                    b.Navigation("Images");
                 });
 
             modelBuilder.Entity("RealEstateSearcher.Core.Models.Quarter", b =>

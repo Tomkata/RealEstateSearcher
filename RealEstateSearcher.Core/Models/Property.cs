@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RealEstateSearcher.Core.Models
 {
@@ -12,33 +8,52 @@ namespace RealEstateSearcher.Core.Models
     {
         public Property()
         {
-            this.Id = Guid.NewGuid();
+            Id = Guid.NewGuid();
+            Images = new HashSet<PropertyImage>();
         }
+
+        [Key]
         public Guid Id { get; set; }
+
         [Required]
         [MaxLength(200)]
-        public string Title { get; set; } = null!;
+        public string Title { get; set; } = string.Empty;
+
         [Range(0, double.MaxValue)]
         public decimal Price { get; set; }
+
+        [Range(1, 10000)]
         [Required]
-        [Range(1, 500)]
         public int Area { get; set; }
 
         [NotMapped]
-        public decimal PriceByArea => this.Price / this.Area;
-        [Range(0, 100)]
-        public int Floor { get; set; }
-        [Range(0, 100)]
+        public decimal PriceByArea =>  Price / Area ;
 
+        [Range(0, 200)]
+        public int Floor { get; set; }
+
+        [Range(0, 200)]
         public int TotalFloors { get; set; }
 
-        [ForeignKey(nameof(Quarter))]
+        [Required]
         public Guid QuarterId { get; set; }
-        public Quarter Quarter { get; set; }
 
-        [ForeignKey(nameof(BuildingType))]
+        [ForeignKey(nameof(QuarterId))]
+        public Quarter Quarter { get; set; } = null!;
+
         public Guid? BuildingTypeId { get; set; }
-        public BuildingType BuildingType { get; set; }
 
+        [ForeignKey(nameof(BuildingTypeId))]
+        public BuildingType? BuildingType { get; set; }
+
+        public string? ImageUrl { get; set; } 
+
+        public ICollection<PropertyImage> Images { get; set; } 
+
+        [MaxLength(1000)]
+        public string? Description { get; set; }
+
+        [MaxLength(100)]
+        public string? SourceLink { get; set; } 
     }
 }
