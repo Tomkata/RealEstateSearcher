@@ -4,6 +4,12 @@
     ViewData["Title"] = "Всички имоти";
 }
 
+@{
+    var firstProperty = Model.Items.FirstOrDefault();
+}
+
+
+
 <div class="container mt-4">
     <div class="row mb-4">
         <div class="col-md-8">
@@ -43,19 +49,50 @@
             @foreach (var property in Model.Items)
             {
                 <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="card h-100 shadow-sm">
+                    <div class="card h-100 shadow-sm hover-shadow">
+
+                        @if (!string.IsNullOrWhiteSpace(property.ImageUrl))
+                        {
+                            <img src="@property.ImageUrl"
+                                 class="card-img-top"
+                                 style="height: 250px; object-fit: cover;"
+                                 alt="@property.Title"
+                                 onerror="this.src='https://via.placeholder.com/400x250/667eea/ffffff?text=No+Image'" />
+                        }
+                        else
+                        {
+                            <div class="card-img-top bg-gradient text-center"
+                                 style="height: 250px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                <div class="text-white">
+                                    <i class="bi bi-house-fill" style="font-size: 4rem;"></i>
+                                    <p class="mt-2">Няма снимка</p>
+                                </div>
+                            </div>
+                        }
+
+                        <!-- Badge за брой снимки -->
+                        @if (property.Images != null && property.Images.Any())
+                        {
+                            <span class="position-absolute top-0 end-0 m-2 badge bg-dark">
+                                <i class="bi bi-images"></i> @property.Images.Count
+                            </span>
+                        }
+
+                        <!-- Заглавие и Цена -->
                         <div class="card-header bg-primary text-white">
                             <h5 class="card-title mb-0 text-truncate" title="@property.Title">
                                 @property.Title
                             </h5>
+                            <h6 class="text-warning mt-2 mb-0">
+                                <i class="bi bi-currency-euro"></i> @property.Price.ToString("N0") лв
+                            </h6>
                         </div>
+
+                        <!-- Детайли -->
                         <div class="card-body">
-                            <h3 class="text-primary mb-2">
-                                @property.Price.ToString("N0") лв
-                            </h3>
                             <p class="text-muted small mb-3">
                                 <i class="bi bi-calculator"></i>
-                                @((property.Price / property.Area).ToString("N0")) лв/m²
+                                @property.PriceByArea.ToString("N0") лв/m²
                             </p>
 
                             <ul class="list-unstyled">
@@ -81,6 +118,7 @@
                                 }
                             </ul>
                         </div>
+
                         <div class="card-footer bg-light">
                             <div class="d-grid gap-2">
                                 <a asp-action="Details" asp-route-id="@property.Id"
@@ -99,17 +137,17 @@
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
             }
         </div>
 
-        <!-- Pagination навигация -->
+        <!-- Pagination -->
         @if (Model.TotalPages > 1)
         {
             <nav aria-label="Навигация по страници" class="mt-4">
                 <ul class="pagination justify-content-center">
-                    <!-- Previous бутон -->
                     <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
                         <a class="page-link"
                            asp-action="Index"
@@ -119,7 +157,6 @@
                         </a>
                     </li>
 
-                    <!-- Номера на страници -->
                     @{
                         var startPage = Math.Max(1, Model.PageNumber - 2);
                         var endPage = Math.Min(Model.TotalPages, Model.PageNumber + 2);
@@ -132,21 +169,14 @@
                         </li>
                         @if (startPage > 2)
                         {
-                            <li class="page-item disabled">
-                                <span class="page-link">...</span>
-                            </li>
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
                         }
                     }
 
                     @for (int i = startPage; i <= endPage; i++)
                     {
                         <li class="page-item @(i == Model.PageNumber ? "active" : "")">
-                            <a class="page-link"
-                               asp-action="Index"
-                               asp-route-page="@i"
-                               asp-route-pageSize="@Model.PageSize">
-                                @i
-                            </a>
+                            <a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-pageSize="@Model.PageSize">@i</a>
                         </li>
                     }
 
@@ -154,33 +184,21 @@
                     {
                         @if (endPage < Model.TotalPages - 1)
                         {
-                            <li class="page-item disabled">
-                                <span class="page-link">...</span>
-                            </li>
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
                         }
                         <li class="page-item">
-                            <a class="page-link"
-                               asp-action="Index"
-                               asp-route-page="@Model.TotalPages"
-                               asp-route-pageSize="@Model.PageSize">
-                                @Model.TotalPages
-                            </a>
+                            <a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages" asp-route-pageSize="@Model.PageSize">@Model.TotalPages</a>
                         </li>
                     }
 
-                    <!-- Next бутон -->
                     <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
-                        <a class="page-link"
-                           asp-action="Index"
-                           asp-route-page="@(Model.PageNumber + 1)"
-                           asp-route-pageSize="@Model.PageSize">
+                        <a class="page-link" asp-action="Index" asp-route-page="@(Model.PageNumber + 1)" asp-route-pageSize="@Model.PageSize">
                             Следваща <i class="bi bi-chevron-right"></i>
                         </a>
                     </li>
                 </ul>
             </nav>
 
-            <!-- Page size selector -->
             <div class="text-center mb-4">
                 <span class="text-muted me-2">Покажи на страница:</span>
                 <div class="btn-group" role="group">
@@ -197,3 +215,14 @@
         }
     }
 </div>
+
+<style>
+    .hover-shadow {
+        transition: all 0.3s ease;
+    }
+
+        .hover-shadow:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        }
+</style>

@@ -1,116 +1,255 @@
 ﻿@model RealEstateSearcher.Core.Models.Property
 
 @{
-    ViewData["Title"] = "Детайли за имот";
+    ViewData["Title"] = Model.Title;
 }
 
 <div class="container mt-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-action="Index">Всички имоти</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@Model.Title</li>
+        </ol>
+    </nav>
+
     <div class="row">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h2 class="mb-0">
-                        <i class="bi bi-house-door"></i> @Model.Title
-                    </h2>
-                </div>
-                <div class="card-body">
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <h3 class="text-primary">
-                                @Model.Price.ToString("N0") лв
-                            </h3>
-                            <p class="text-muted">
-                                <i class="bi bi-calculator"></i>
-                                @Model.PriceByArea.ToString("N0") лв/m²
-                            </p>
-                        </div>
-                        <div class="col-md-6 text-end">
-                            <span class="badge bg-info fs-6">
-                                <i class="bi bi-geo-alt"></i> @Model.Quarter.Name
-                            </span>
+        <!-- Снимки - Ляво -->
+        <div class="col-lg-8">
+            <!-- Главна снимка -->
+            <div class="card shadow-sm mb-3">
+                @if (Model.Images != null && Model.Images.Any())
+                {
+                    <img id="mainImage"
+                         src="@Model.Images.OrderBy(i => i.Order).First().ImageUrl"
+                         class="card-img-top"
+                         style="height: 500px; object-fit: cover; cursor: zoom-in;"
+                         alt="@Model.Title"
+                         onclick="openLightbox(0)" />
+                }
+                else if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
+                {
+                    <img src="@Model.ImageUrl"
+                         class="card-img-top"
+                         style="height: 500px; object-fit: cover;"
+                         alt="@Model.Title" />
+                }
+                else
+                {
+                    <div class="card-img-top bg-gradient text-center"
+                         style="height: 500px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <div class="text-white">
+                            <i class="bi bi-house-fill" style="font-size: 6rem;"></i>
+                            <p class="mt-3 fs-4">Няма снимка</p>
                         </div>
                     </div>
+                }
+            </div>
+
+            @if (Model.Images != null && Model.Images.Count > 1)
+            {
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">
+                            <i class="bi bi-images"></i> Галерия (@Model.Images.Count снимки)
+                        </h5>
+                        <div class="row g-2">
+                            @foreach (var image in Model.Images.OrderBy(i => i.Order))
+                            {
+                                var index = Model.Images.OrderBy(i => i.Order).ToList().IndexOf(image);
+                                <div class="col-3">
+                                    <img src="@image.ImageUrl"
+                                         class="img-thumbnail"
+                                         style="height: 100px; width: 100%; object-fit: cover; cursor: pointer;"
+                                         alt="Снимка @(index + 1)"
+                                         onclick="changeMainImage('@image.ImageUrl', @index)" />
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Детайли - Дясно -->
+        <div class="col-lg-4">
+            <!-- Цена Card -->
+            <div class="card shadow-sm mb-3 border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-currency-exchange"></i>
+                        @Model.Price.ToString("N0") лв
+                    </h4>
+                    <small class="text-white-50">
+                        @Model.PriceByArea.ToString("N0") лв/m²
+                    </small>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">@Model.Title</h5>
 
                     <hr />
 
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <h5><i class="bi bi-rulers"></i> Площ</h5>
-                            <p class="lead">@Model.Area m²</p>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <h5><i class="bi bi-building"></i> Етаж</h5>
-                            <p class="lead">@Model.Floor / @Model.TotalFloors</p>
-                        </div>
+                    <div class="mb-3">
+                        <i class="bi bi-geo-alt-fill text-primary"></i>
+                        <strong>Квартал:</strong>
+                        <span class="badge bg-info ms-2">@Model.Quarter.Name</span>
+                    </div>
+
+                    <div class="mb-3">
+                        <i class="bi bi-rulers text-primary"></i>
+                        <strong>Площ:</strong>
+                        <span class="ms-2">@Model.Area m²</span>
+                    </div>
+
+                    <div class="mb-3">
+                        <i class="bi bi-building text-primary"></i>
+                        <strong>Етаж:</strong>
+                        <span class="ms-2">@Model.Floor / @Model.TotalFloors</span>
                     </div>
 
                     @if (Model.BuildingType != null)
                     {
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <h5><i class="bi bi-house"></i> Тип сграда</h5>
-                                <p class="lead">@Model.BuildingType.Name</p>
-                            </div>
+                        <div class="mb-3">
+                            <i class="bi bi-house-fill text-primary"></i>
+                            <strong>Тип сграда:</strong>
+                            <span class="badge bg-secondary ms-2">@Model.BuildingType.Name</span>
                         </div>
                     }
 
-                    <hr />
-
-                    <div class="alert alert-light">
-                        <h5>Информация за квартал: @Model.Quarter.Name</h5>
-                        <p class="mb-0">
-                            <i class="bi bi-info-circle"></i>
-                            Този имот се намира в квартал @Model.Quarter.Name
-                        </p>
-                    </div>
+                    @if (!string.IsNullOrWhiteSpace(Model.Description))
+                    {
+                        <div class="mb-3">
+                            <i class="bi bi-text-paragraph text-primary"></i>
+                            <strong>Описание:</strong>
+                            <p class="mt-2">@Model.Description</p>
+                        </div>
+                    }
                 </div>
             </div>
-        </div>
 
-        <div class="col-md-4">
-            <div class="">
-                <div class="card-header">
-                    <h5 class="mb-0">Действия</h5>
-                </div>
+            <!-- Действия -->
+            <div class="card shadow-sm">
                 <div class="card-body">
+                    <h6 class="card-title">Действия</h6>
                     <div class="d-grid gap-2">
-                        <a asp-action="Edit" asp-route-id="@Model.Id"
-                           class="btn btn-warning">
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
                             <i class="bi bi-pencil"></i> Редактирай
                         </a>
-                        <a asp-action="Delete" asp-route-id="@Model.Id"
-                           class="btn btn-danger">
+                        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">
                             <i class="bi bi-trash"></i> Изтрий
                         </a>
-                        <hr />
                         <a asp-action="Index" class="btn btn-secondary">
-                            <i class="bi bi-arrow-left"></i> Обратно към списъка
+                            <i class="bi bi-arrow-left"></i> Назад към списъка
                         </a>
                     </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Бързи изчисления</h5>
-                </div>
-                <div class="card-body">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item d-flex justify-content-between">
-                            <span>Цена за m²</span>
-                            <strong>@Model.PriceByArea.ToString("N0") лв</strong>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between">
-                            <span>Обща площ</span>
-                            <strong>@Model.Area m²</strong>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between">
-                            <span>Обща цена</span>
-                            <strong>@Model.Price.ToString("N0") лв</strong>
-                        </li>
-                    </ul>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Lightbox Modal -->
+<div class="modal fade" id="lightboxModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content bg-dark">
+            <div class="modal-header border-0">
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="lightboxImage" src="" class="img-fluid" style="max-height: 80vh;" alt="Снимка" />
+            </div>
+            <div class="modal-footer border-0 justify-content-between">
+                <button class="btn btn-light" onclick="previousImage()">
+                    <i class="bi bi-chevron-left"></i> Предишна
+                </button>
+                <span class="text-white" id="imageCounter"></span>
+                <button class="btn btn-light" onclick="nextImage()">
+                    Следваща <i class="bi bi-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const images = [
+            @if (Model.Images != null && Model.Images.Any())
+            {
+                    @foreach (var image in Model.Images.OrderBy(i => i.Order))
+                    {
+                            @:{ url: '@image.ImageUrl' },
+                    }
+            }
+        ];
+
+        let currentImageIndex = 0;
+
+        function changeMainImage(url, index) {
+            document.getElementById('mainImage').src = url;
+            currentImageIndex = index;
+        }
+
+        function openLightbox(index) {
+            currentImageIndex = index;
+            updateLightboxImage();
+            const modal = new bootstrap.Modal(document.getElementById('lightboxModal'));
+            modal.show();
+        }
+
+        function updateLightboxImage() {
+            if (images.length > 0) {
+                document.getElementById('lightboxImage').src = images[currentImageIndex].url;
+                document.getElementById('imageCounter').textContent = `${currentImageIndex + 1} / ${images.length}`;
+            }
+        }
+
+        function previousImage() {
+            currentImageIndex = (currentImageIndex - 1 + images.length) % images.length;
+            updateLightboxImage();
+        }
+
+        // Следваща снимка
+        function nextImage() {
+            currentImageIndex = (currentImageIndex + 1) % images.length;
+            updateLightboxImage();
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            const modal = document.getElementById('lightboxModal');
+            if (modal.classList.contains('show')) {
+                if (e.key === 'ArrowLeft') previousImage();
+                if (e.key === 'ArrowRight') nextImage();
+                if (e.key === 'Escape') bootstrap.Modal.getInstance(modal).hide();
+            }
+        });
+    </script>
+}
+
+<style>
+    .img-thumbnail {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+        .img-thumbnail:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3);
+        }
+
+    #mainImage {
+        transition: transform 0.3s;
+    }
+
+        #mainImage:hover {
+            transform: scale(1.02);
+        }
+
+    .modal-content {
+        border: none;
+    }
+
+    .modal-body img {
+        border-radius: 8px;
+    }
+</style>
