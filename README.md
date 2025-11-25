@@ -1,6 +1,6 @@
 🏠 Real Estate Searcher
 
-Modern ASP.NET Core MVC application for real estate search and management in Bulgaria.
+Modern ASP.NET Core MVC application for real estate search and management in Bulgaria - Sofia.
 
 
 
